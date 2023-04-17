@@ -19,7 +19,7 @@ def CheckRet():
 def login():
   if request.method == "POST":
     session.permanent = True
-    user = request.form["nm"]
+    user = request.form["Password"]
     session["user"] = user #this helps keep the data in the session
     flash("House Manager Login Successful!")
     return redirect(url_for("user"))
