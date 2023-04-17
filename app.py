@@ -15,19 +15,33 @@ def home():
 def CheckRet():
   return render_template("CheckRet.html")
     
+from werkzeug.security import generate_password_hash, check_password_hash
+
 @app.route("/login", methods=["POST", "GET"])
 def login():
   if request.method == "POST":
-    session.permanent = True
-    user = request.form["Password"]
-    session["user"] = user #this helps keep the data in the session
-    flash("House Manager Login Successful!")
-    return redirect(url_for("user"))
-  else:
-    if "user" in session:
-      flash("Already Logged In!")
+    password = request.form["password"]
+    if validate_password(password):
+      session.permanent = True
+      user = request.form["password"]
+      session["user"] = user
+      flash("House Manager Login Successful!")
       return redirect(url_for("user"))
+    else:
+      if "user" in session:
+        flash("Already Logged In!")
+        return redirect(url_for("user"))
+      flash("Invalid password!")
+      return redirect(url_for("login"))
+  else:
     return render_template("login.html")
+
+def validate_password(password):
+  # Perform password validation here
+  hashed_password = generate_password_hash("1107", method="sha256", salt_length=8)
+  return check_password_hash(hashed_password, password)
+
+
 
 @app.route("/user")
 def user():
