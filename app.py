@@ -21,7 +21,7 @@ def login():
     session.permanent = True
     user = request.form["nm"]
     session["user"] = user #this helps keep the data in the session
-    flash("Login Successful!")
+    flash("House Manager Login Successful!")
     return redirect(url_for("user"))
   else:
     if "user" in session:
