@@ -11,6 +11,10 @@ app.permanent_session_lifetime = timedelta(minutes=5)
 def home():
   return render_template("index.html")
 
+@app.route("/CheckRet")
+def CheckRet():
+  return render_template("CheckRet.html")
+    
 @app.route("/login", methods=["POST", "GET"])
 def login():
   if request.method == "POST":
