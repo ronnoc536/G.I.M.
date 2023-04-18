@@ -9,9 +9,27 @@
       {% endfor %}
      {% endif %} 
   {% endwith %}
-<form action = "/login" method = "POST">
-  <p>House Manager Password:</p>
-  <p><input type = "password" name = "password" /></p>
-  <p><input type = "submit" name = "submit" /></p>
-</form>
+
+<head>
+  <style>
+    #login-block {
+      text-align: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+  <body>
+    <div id="login-block">
+      <form action = "/login" method = "POST">
+        <p>House Manager Password:</p>
+        <p><input type = "password" name = "password" /></p>
+        <p><input type = "submit" name = "submit" /></p>
+      </form>
+    </div>  
+  </body>
+</head>  
+
+
 {% endblock %}
