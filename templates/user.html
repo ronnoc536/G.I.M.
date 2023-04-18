@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}User {% endblock %}
+{% block title %}User{% endblock %}
 {% block content %}
 {% with messages = get_flashed_messages() %}
     {%if messages%} 
@@ -10,7 +10,8 @@
   {% endwith %}
 <p>Welcome, Nathan!</p>
 
-<button type="button" class="btn btn-primary btn-lg btn-block">Add Tool</button>
+<!-- takes to add tools page-->
+<a href="/add_tool_page"><button type="button" class="btn btn-primary btn-lg btn-block">Add Tool</button></a>
 <button type="button" class="btn btn-secondary btn-lg btn-block">Remove Tool</button>
 <button type="button" class="btn btn-primary btn-lg btn-block">Edit Tool</button>
 <button type="button" class="btn btn-secondary btn-lg btn-block">View All Tools</button>
