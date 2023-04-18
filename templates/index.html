@@ -1,10 +1,54 @@
 {% extends "base.html" %}
 {% block title %}Home Page {% endblock %}
 {% block content %}
-<h1>Say hello to GIM!</h1>
-<h3>TKE's Garage Inventory Manager</h3>
-<p>
-  GIM is here to help dumb tekes to manage all 
-  the tools in our garage.
-</p>
+
+<head>
+  <title>GIM - TKE's Garage Inventory Manager</title>
+  <style>
+    header {
+      background-color: #AD2624;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      font-size: 3em;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    h3 {
+      margin: 20px 0;
+      font-size: 2em;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-align: center;
+    }
+    p {
+      text-align: center;
+      }
+    .NathanPic {
+      display: block;
+      margin: 0 auto;
+      width: 650px;
+    }
+    
+  </style>
+</head>
+<body>
+  <header>
+    <h1>TKE's Garage Inventory Manager</h1>
+  </header>
+  <main>
+    <h3>Say HI to GIM!</h3>
+    <p>
+      GIM is here to help dumb tekes to manage all 
+      the tools in our garage.
+    </p>
+    <img src="{{ url_for('static', filename='NathanThumb.JPG') }}" alt="Nathan" class="NathanPic">
+  </main>
+</body>
+
+
 {% endblock %}
