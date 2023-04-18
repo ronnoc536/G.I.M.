@@ -11,6 +11,7 @@ Garage Inventory Project -- CS2300 Final Project
   - This is the landing page for the Check/Ret option on the Navbar.
 - login.html
   - this is where the House Manager can login to get transfered to the user page (which needs to be transfered to the "admin" page).
+  - Default password for the house manager is 1107247
 - user.html
   - This is what i want to switch all reference of to the "admin.html".
   - This will be where the House Manager or the admin can alter the databases contents other than just checking it out or returning it. 
