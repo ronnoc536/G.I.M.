@@ -15,6 +15,13 @@ def home():
 @app.route("/CheckRet")
 def CheckRet():
   return render_template("CheckRet.html")
+
+@app.route('/add_tool_page', methods=["POST", "GET"])
+def add_tool_page():
+  if request.method == "POST":#if they clicked submit on add tools for example
+                              # also where i think that the adding tool to db would go but idk
+    return redirect(url_for("user")) # takes them back to where the options are
+  return render_template("add_tool_page.html")
     
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -42,6 +49,7 @@ def validate_password(password):
 
 @app.route("/user")
 def user():
+  
   if "user" in session:
     user = session["user"]
     return render_template("user.html", user = user)

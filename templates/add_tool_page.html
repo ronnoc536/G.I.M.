@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}add_tool_page{% endblock %}
+{% block content %}
+<h5>
+  Please fill in the forms with the apporpriate
+   information regarding the tool you would like to add.
+</h5>
+<form action = "/add_tool_page" method = "POST">
+  <p> Tool Name (Be Relatively Specific): <input type = "text" name = "tool_name" /></p>
+  <p> Location of Tool: <input type = "text" name = "tool_location" /></p>
+  <p> Condition of Tool: <input type = "text" name = "tool_cond" /></p>
+  <p> Serial Number: <input type = "number" name = "serial_num" /></p>
+  <p><input type = "submit" name = "submit" /></p>
+</form>
+{% endblock %}
