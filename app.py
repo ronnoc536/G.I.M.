@@ -1,5 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 app = Flask(__name__)
@@ -15,23 +16,21 @@ def home():
 def CheckRet():
   return render_template("CheckRet.html")
     
-from werkzeug.security import generate_password_hash, check_password_hash
-
 @app.route("/login", methods=["POST", "GET"])
 def login():
-  if request.method == "POST":
-    password = request.form["password"]
-    if validate_password(password):
-      session.permanent = True
+  if "user" in session:
+    flash("Already Logged In!") # let them know they are still logged in 
+    return redirect(url_for("user")) # take them to the user page
+  if request.method == "POST": #if password is submitted
+    password = request.form["password"] #assign var to the form data
+    if validate_password(password): #validate the password
+      session.permanent = True  #This and the next 2 lines is to do with the session
       user = request.form["password"]
       session["user"] = user
-      flash("House Manager Login Successful!")
-      return redirect(url_for("user"))
+      flash("House Manager Login Successful!") #let them know they got logged in
+      return redirect(url_for("user")) #send them to the user page
     else:
-      if "user" in session:
-        flash("Already Logged In!")
-        return redirect(url_for("user"))
-      flash("Invalid password!")
+      flash("Invalid password!") # if still in the 
       return redirect(url_for("login"))
   else:
     return render_template("login.html")
