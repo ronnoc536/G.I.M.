@@ -1,6 +1,40 @@
 {% extends "base.html" %}
 {% block title %}CheckRet {% endblock %}
 {% block content %}
-  <a href="/checkout_tool"><button type="button" class="btn btn-primary btn-lg">Checkout</button></a>
-  <a href="/return_tool"><button type="button" class="btn btn-secondary btn-lg">Return</button></a>
+<head>
+  <style>
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+    }
+    
+    .crossed_tools {
+      display: block;
+      margin-right: 20px;
+      width: 300px;
+    }
+    
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .button-container button {
+      margin: 10px;
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="{{ url_for('static', filename='crossed_tools.png') }}" alt="tools" class="crossed_tools">
+    <div class="button-container">
+      <a href="/checkout_tool"><button type="button" class="btn btn-primary btn-lg">Checkout</button></a>
+      <a href="/return_tool"><button type="button" class="btn btn-secondary btn-lg">Return</button></a>
+    </div>
+  </div>
+</body>
 {% endblock %}
