@@ -18,6 +18,11 @@ Garage Inventory Project -- CS2300 Final Project
       - This means adding, removing, altering.
 - add_tool_page.html
   - This is where the form is to add a new tool into the db.
+- checkout_tool_page.html
+  - (currently the content is just a placeholder) This is where the user will be able to alert the system of what tool they will be checking out.
+- return_tool_page.html
+  - (currently the content is just a placeholder) This is where the user will be able to alert the system of what tool they will be returning. 
+
 
 
 once inside repo..

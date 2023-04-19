@@ -16,6 +16,14 @@ def home():
 def CheckRet():
   return render_template("CheckRet.html")
 
+@app.route("/checkout_tool")
+def checkout_tool_page():
+  return render_template("checkout_tool_page.html")
+
+@app.route("/return_tool")
+def return_tool_page():
+  return render_template("return_tool_page.html")
+
 @app.route('/add_tool_page', methods=["POST", "GET"])
 def add_tool_page():
   if "user" in session:
