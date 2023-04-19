@@ -23,8 +23,8 @@ def add_tool_page():
                                 # also where i think that the adding tool to db would go but idk
       flash("Tool added successfully!") #lets user know that it got added
       return redirect(url_for("user")) # takes them back to where the options are
-    return render_template("add_tool_page.html")
-  else:
+    return render_template("add_tool_page.html") # dont remember
+  else: 
     return redirect(url_for("user")) #send to user func where they will be told they are not logged in
     
 @app.route("/login", methods=["POST", "GET"])
@@ -64,7 +64,7 @@ def user():
 def logout():
   if "user" in session:
     user = session["user"]
-    flash(f"You have been logged out.", "info")
+    flash(f"You have been logged out", "info")
   session.pop("user", None)
   return redirect(url_for("login"))
 
