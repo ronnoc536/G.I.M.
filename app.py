@@ -18,6 +18,10 @@ def home():
   """
   return render_template("index.html")
 
+@app.route("/instructions")
+def need_help():
+  return render_template("instructions.html")
+
 @app.route("/CheckRet")
 def CheckRet():
   """
