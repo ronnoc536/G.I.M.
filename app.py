@@ -7,6 +7,16 @@ app = Flask(__name__, static_folder='static') # Create a new Flask object named 
 app.secret_key = "hello"
 app.permanent_session_lifetime = timedelta(minutes=5) # Set the permanent session lifetime to 5 minutes using the timedelta class
 
+@app.errorhandler(404)
+def page_not_found(e):
+  """
+  Render a custom 404 error page when the requested resource is not found.
+
+  :param e: The error that occurred.
+  :return: A rendered HTML template for the custom 404 error page.
+  """
+  return render_template('404.html'), 404
+
 @app.route("/")
 def home():
   """

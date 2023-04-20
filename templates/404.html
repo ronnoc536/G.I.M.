@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}404{% endblock %}
+
+{% block content %}
+<head>
+  <style>
+    #four_o_four {
+      text-align: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+  <body>
+    <div id="four_o_four">
+      <h1>404 Error: No Content To Be Found</h1>
+      <p>Please navigate to a known page.</p>
+    </div>
+  </body>
+</head>  
+{% endblock %}
