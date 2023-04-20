@@ -14,13 +14,14 @@ def home():
   It returns the rendered HTML template for the index page.
   
   Returns:
-      str: Rendered HTML template for the index page.
+    Rendered HTML template for the index page.
   """
   return render_template("index.html")
 
-@app.route("/instructions")
+@app.route("/help")
+
 def need_help():
-  return render_template("instructions.html")
+  return render_template("help.html")
 
 @app.route("/CheckRet")
 def CheckRet():
