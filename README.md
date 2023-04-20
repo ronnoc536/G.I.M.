@@ -18,10 +18,19 @@ Garage Inventory Project -- CS2300 Final Project
       - This means adding, removing, altering.
 - add_tool_page.html
   - This is where the form is to add a new tool into the db.
+- remove_tool_page.html
+  - (currently the content is just a placeholder) This is where the user will remove a tool from TKE's garage.
+- edit_tool_page.html
+  - (currently the content is just a placeholder) This is where the user will be able to alter the attributes of the TKE garage.
+- view_tools_page.html
+  - Place holder for this action page.
 - checkout_tool_page.html
   - (currently the content is just a placeholder) This is where the user will be able to alert the system of what tool they will be checking out.
 - return_tool_page.html
-  - (currently the content is just a placeholder) This is where the user will be able to alert the system of what tool they will be returning. 
+  - (currently the content is just a placeholder) This is where the user will be able to alert the system of what tool they will be returning.
+- 404.html
+  - error handler for 404 errors.
+ 
 
 
 
