@@ -29,7 +29,6 @@ def home():
   return render_template("index.html")
 
 @app.route("/help")
-
 def need_help():
   return render_template("help.html")
 
@@ -62,6 +61,18 @@ def return_tool_page():
         HTML template: The return_tool_page.html template to be rendered.
     """
   return render_template("return_tool_page.html")
+
+@app.route("/remove_tool_page")
+def remove_tool():
+  return render_template("remove_tool_page.html")
+
+@app.route("/edit_tool_page")
+def edit_tool():
+  return render_template("edit_tool_page.html")
+
+@app.route("/view_tools_page")
+def view_tools():
+  return render_template("view_tools_page.html")
 
 @app.route('/add_tool_page', methods=["POST", "GET"])
 def add_tool_page():
