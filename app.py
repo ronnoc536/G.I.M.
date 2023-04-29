@@ -64,15 +64,28 @@ def return_tool_page():
 
 @app.route("/remove_tool_page")
 def remove_tool():
-  return render_template("remove_tool_page.html")
+  if "user" in session:
+    return render_template("remove_tool_page.html")
+  else: 
+    return redirect(url_for("user")) #send to user func where they will be told they are not logged in
+  
 
 @app.route("/edit_tool_page")
 def edit_tool():
-  return render_template("edit_tool_page.html")
+  if "user" in session:
+    return render_template("edit_tool_page.html")
+  else: 
+    return redirect(url_for("user")) #send to user func where they will be told they are not logged in
+  
+  
 
 @app.route("/view_tools_page")
 def view_tools():
-  return render_template("view_tools_page.html")
+  if "user" in session:
+    return render_template("view_tools_page.html")
+  else: 
+    return redirect(url_for("user")) #send to user func where they will be told they are not logged in
+  
 
 @app.route('/add_tool_page', methods=["POST", "GET"])
 def add_tool_page():
