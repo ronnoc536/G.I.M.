@@ -1,11 +1,19 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+import mysql.connector
 
 
 app = Flask(__name__, static_folder='static') # Create a new Flask object named 'app' and set the static folder to 'static'
 app.secret_key = "hello"
 app.permanent_session_lifetime = timedelta(minutes=5) # Set the permanent session lifetime to 5 minutes using the timedelta class
+
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="110724742069",
+  database="TKE_Garage"
+)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -99,7 +107,13 @@ def add_tool_page():
   """
   if "user" in session:
     if request.method == "POST":#if they clicked submit on add tools for example
-                                # also where i think that the adding tool to db would go but idk
+      data = request.form #gathers the data from the form into a container to be indexed.
+      cursor = mydb.cursor()
+      sql = f"INSERT INTO Tools (id, name, last_user, location, last_returned, quality, last_taken) \
+                VALUES ({data['serial_num']}, \"{data['tool_name']}\", 0, \"{data['tool_location']}\", \"2022-05-01\", \"{data['tool_cond']}\", \"2022-05-01\")"
+        #values = (data['serial_num'], data['tool_name'], data['last_user'], data['tool_location'], "2022-05-01", data['tool_cond'], "2022-05-01")
+      cursor.execute(sql)
+      mydb.commit()
       flash("Tool added successfully!") #lets user know that it got added
       return redirect(url_for("user")) # takes them back to where the options are
     return render_template("add_tool_page.html") # dont remember
