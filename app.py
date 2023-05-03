@@ -8,6 +8,7 @@ app = Flask(__name__, static_folder='static') # Create a new Flask object named 
 app.secret_key = "hello"
 app.permanent_session_lifetime = timedelta(minutes=5) # Set the permanent session lifetime to 5 minutes using the timedelta class
 
+# bad security who cares
 mydb = mysql.connector.connect(
   host="localhost",
   user="root",
@@ -25,6 +26,7 @@ def page_not_found(e):
   """
   return render_template('404.html'), 404
 
+
 @app.route("/")
 def home():
   """
@@ -36,9 +38,11 @@ def home():
   """
   return render_template("index.html")
 
+
 @app.route("/help")
 def need_help():
   return render_template("help.html")
+
 
 @app.route("/CheckRet")
 def CheckRet():
@@ -50,6 +54,7 @@ def CheckRet():
   """
   return render_template("CheckRet.html")
 
+
 @app.route("/checkout_tool")
 def checkout_tool_page():
   """
@@ -59,6 +64,7 @@ def checkout_tool_page():
       rendered HTML template: checkout_tool_page.html
   """
   return render_template("checkout_tool_page.html") 
+
 
 @app.route("/return_tool")
 def return_tool_page():
@@ -70,12 +76,25 @@ def return_tool_page():
     """
   return render_template("return_tool_page.html")
 
-@app.route("/remove_tool_page")
+
+@app.route("/remove_tool_page", methods=["GET", "POST"])
 def remove_tool():
   if "user" in session:
-    return render_template("remove_tool_page.html")
-  else: 
-    return redirect(url_for("user")) #send to user func where they will be told they are not logged in
+    # Retrieve all tools from the database
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Tools")
+    tools = cursor.fetchall()
+    if request.method == "POST":
+      data = request.form
+      tool_id = data["serial_num"]
+      cursor.execute(f"DELETE FROM Tools WHERE id = {tool_id}")
+      mydb.commit()
+      flash("Tool removed successfully!")
+      return redirect(url_for("user"))
+    return render_template("remove_tool_page.html", tools=tools)
+  else:
+    return redirect(url_for("user"))
+
   
 
 @app.route("/edit_tool_page")
@@ -86,11 +105,14 @@ def edit_tool():
     return redirect(url_for("user")) #send to user func where they will be told they are not logged in
   
   
-
 @app.route("/view_tools_page")
 def view_tools():
   if "user" in session:
-    return render_template("view_tools_page.html")
+    # Retrieve all tools from the database
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Tools")
+    tools = cursor.fetchall()
+    return render_template("view_tools_page.html", tools=tools)
   else: 
     return redirect(url_for("user")) #send to user func where they will be told they are not logged in
   
@@ -112,8 +134,8 @@ def add_tool_page():
       sql = f"INSERT INTO Tools (id, name, last_user, location, last_returned, quality, last_taken) \
                 VALUES ({data['serial_num']}, \"{data['tool_name']}\", 0, \"{data['tool_location']}\", \"2022-05-01\", \"{data['tool_cond']}\", \"2022-05-01\")"
         #values = (data['serial_num'], data['tool_name'], data['last_user'], data['tool_location'], "2022-05-01", data['tool_cond'], "2022-05-01")
-      cursor.execute(sql)
-      mydb.commit()
+      cursor.execute(sql) # executes the sql
+      mydb.commit() # sends the request i guess?
       flash("Tool added successfully!") #lets user know that it got added
       return redirect(url_for("user")) # takes them back to where the options are
     return render_template("add_tool_page.html") # dont remember
@@ -193,4 +215,7 @@ def logout():
   return redirect(url_for("login"))
 
 if __name__ == "__main__":
+  cursor = mydb.cursor() # just a test
+  cursor.execute("SELECT * FROM Tools WHERE id = 69") # just a test
+  print(cursor.fetchall()) # just a test
   app.run(debug = True)

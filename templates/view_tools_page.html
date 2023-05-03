@@ -1,23 +1,45 @@
 {% extends "base.html" %}
-{% block title %}Edit Tool {% endblock %}
+{% block title %}View Tools {% endblock %}
 {% block content %}
 
+<!DOCTYPE html>
+<html>
 <head>
-  <style>
-    #place-holder-bullshit {
-      text-align: center;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-  </style>
-  <body>
-    <div id="place-holder-bullshit">
-      <p>This is where the user will <strong>View</strong> tools.</p> 
-      <p><em>How?</em></p>
-      <p>Not sure yet.</p>
-    </div>
-  </body>
-</head>  
+	<title>All Tools in TKE Garage</title>
+	<style>
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+	<h1>All Tools in TKE Garage</h1>
+	<table>
+		<tr>
+			<th>ID</th>
+			<th>Name</th>
+			<th>Last User</th>
+			<th>Location</th>
+			<th>Last Returned</th>
+			<th>Quality</th>
+			<th>Last Taken</th>
+		</tr>
+		{% for tool in tools %}
+			<tr>
+				<td>{{ tool[0] }}</td>
+				<td>{{ tool[1] }}</td>
+				<td>{{ tool[2] }}</td>
+					<td>{{ tool[3] }}</td>
+				<td>{{ tool[4] }}</td>
+				<td>{{ tool[5] }}</td>
+				<td>{{ tool[6] }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+</body>
+</html>
 {% endblock %}
