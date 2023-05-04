@@ -199,9 +199,8 @@ def add_tool_page():
     if request.method == "POST":#if they clicked submit on add tools for example
       data = request.form #gathers the data from the form into a container to be indexed.
       cursor = mydb.cursor()
-      sql = f"INSERT INTO Tools (id, name, last_user, location, last_returned, quality, last_taken) \
-                VALUES ({data['serial_num']}, \"{data['tool_name']}\", 0, \"{data['tool_location']}\", \"2022-05-01\", \"{data['tool_cond']}\", \"2022-05-01\")"
-        #values = (data['serial_num'], data['tool_name'], data['last_user'], data['tool_location'], "2022-05-01", data['tool_cond'], "2022-05-01")
+      sql = f"INSERT INTO Tools (name, last_user, location, last_returned, quality, last_taken) \
+                VALUES (\"{data['tool_name']}\", NULL, \"{data['tool_location']}\", CURRENT_DATE(), \"{data['tool_cond']}\", \"1936-11-12\")"
       cursor.execute(sql) # executes the sql
       mydb.commit() # sends the request i guess?
       flash("Tool added successfully!") #lets user know that it got added
