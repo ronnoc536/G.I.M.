@@ -27,7 +27,6 @@ def page_not_found(e):
   """
   return render_template('404.html'), 404
 
-
 @app.route("/")
 def home():
   """
@@ -39,11 +38,9 @@ def home():
   """
   return render_template("index.html")
 
-
 @app.route("/help")
 def need_help():
   return render_template("help.html")
-
 
 @app.route("/CheckRet")
 def CheckRet():
@@ -54,7 +51,6 @@ def CheckRet():
     The rendered CheckRet.html template.
   """
   return render_template("CheckRet.html")
-
 
 @app.route("/checkout_tool", methods=["GET", "POST"])
 def checkout_tool_page():
@@ -73,12 +69,11 @@ def checkout_tool_page():
     tool_id = data["serial_num"]
     scroll_id = data["scroll_num"]
     cursor.execute(f"UPDATE Tools SET last_user = {scroll_id}, last_taken = CURRENT_DATE() WHERE id = {tool_id}")
+    cursor.execute(f"UPDATE TKE_Member Set tool_checked_out = {tool_id} WHERE scroll_number = {scroll_id}")
     mydb.commit()
     flash("Tool checked out!")
     return redirect(url_for("CheckRet"))
   return render_template("checkout_tool_page.html", tools = tools) 
-
-
 
 @app.route("/return_tool", methods=["GET", "POST"])
 def return_tool_page():
@@ -105,7 +100,6 @@ def return_tool_page():
         flash("Tool returned!")
         return redirect(url_for("CheckRet"))
 
-
 @app.route("/remove_tool_page", methods=["GET", "POST"])
 def remove_tool():
   if "user" in session:
@@ -124,7 +118,6 @@ def remove_tool():
   else:
     return redirect(url_for("user"))
 
-
 @app.route("/edit_tool_page", methods=["GET", "POST"])
 def edit_tool():
   if "user" in session:
@@ -142,7 +135,6 @@ def edit_tool():
   else: 
     return redirect(url_for("user"))
 
-
 @app.route("/2_edit_tool_page", methods=["GET"])
 def edit_tool_get():
   print("Loaded page")
@@ -156,8 +148,6 @@ def edit_tool_get():
   else:
     return redirect(url_for("edit_tool"))
 
-
-  
 @app.route("/2_edit_tool_page", methods=["POST"])
 def edit_tool_2():
     #if form on this page was submited
@@ -172,7 +162,6 @@ def edit_tool_2():
       return redirect(url_for("user"))
     except:
       return redirect(url_for("edit_tool"))
-
 
 @app.route("/view_tools_page")
 def view_tools():
@@ -237,19 +226,6 @@ def login():
   else:
     return render_template("login.html")
 
-def validate_password(password):
-  """
-  Validates password by generating a hash using the generate_password_hash() function
-  and checking it against the input password using check_password_hash() function.
-
-  Args: 
-    password (str): password input by user.
-
-  Returns:
-    bool: True if the input password matches the generated hash, False otherwise.
-  """
-  hashed_password = generate_password_hash("1107", method="sha256", salt_length=8)
-  return check_password_hash(hashed_password, password)
 
 @app.route("/user")
 def user():
@@ -282,12 +258,36 @@ def garage():
 @app.route("/search", methods=["POST", "GET"])
 def search():
   if request.method == "POST":
+      cursor = mydb.cursor()
       Searched_Term = request.form["Searched_Term"]
       cursor.execute(f"SELECT * FROM Tools WHERE name LIKE '%{Searched_Term}%'")
       tools_from_search = cursor.fetchall()
       mydb.commit()
       return render_template("view_tools_page.html", tools = tools_from_search)
   return render_template("search.html")
+
+@app.route("/wishlist", methods=["GET"])
+def wishlist_get():
+  cursor = mydb.cursor()
+  cursor.execute("SELECT * FROM Tool_Wishlist")
+  wishlist = cursor.fetchall()
+  return render_template("wishlist.html", wishlist=wishlist)
+
+@app.route("/wishlist", methods=["POST"])
+def wishlist():
+  data = request.form
+  action = request.form['action']
+  if action == "Add_Tool":
+    cursor = mydb.cursor()
+    cursor.execute(f"INSERT INTO Tool_Wishlist (name, estimated_price, submitted_by) VALUES (\"{data['tool_name']}\", \"{data['tool_price']}\", \"{data['scroll_num']}\")")
+    mydb.commit()
+    flash("Wishlist updated successfully!")
+  elif action == "Remove_Tool":
+    cursor = mydb.cursor()
+    cursor.execute(f"DELETE FROM Tool_Wishlist WHERE name = \"{data['tool_name']}\"")
+    mydb.commit()
+    flash("Wishlist updated successfully!")
+  return redirect("wishlist")
 
 @app.route("/logout")
 def logout():
@@ -303,8 +303,48 @@ def logout():
   session.pop("user", None)
   return redirect(url_for("login"))
 
+@app.route("/view_members",methods =["GET"])
+def view_members():
+  cursor = mydb.cursor()
+  cursor.execute("SELECT * FROM TKE_Member")
+  member = cursor.fetchall()
+  return render_template("view_members.html", member = member)
+
+@app.route("/view_members",methods =["POST"])
+def view_members_post():
+  try:
+    data = request.form
+    action = request.form['action']
+    if action == "Add_Member":
+      cursor = mydb.cursor()
+      cursor.execute(f"INSERT INTO TKE_Member (scroll_number, name, tool_checked_out) VALUES (\"{data['scroll_number']}\", \"{data['member_name']}\", NULL)")
+      mydb.commit()
+      flash("TKE Member Added Successfully!")
+      return redirect(url_for("view_members"))
+    elif action == "Remove_Member":
+      cursor = mydb.cursor()
+      cursor.execute(f"DELETE FROM TKE_Member WHERE scroll_number = \"{data['scroll_number']}\"")
+      mydb.commit()
+      flash("TKE Member Deleted Successfully!")
+      return redirect(url_for("view_members"))
+  except:
+      flash("Something Went Wrong...")
+      return redirect(url_for("user"))
+
+
+def validate_password(password):
+  """
+  Validates password by generating a hash using the generate_password_hash() function
+  and checking it against the input password using check_password_hash() function.
+
+  Args: 
+    password (str): password input by user.
+
+  Returns:
+    bool: True if the input password matches the generated hash, False otherwise.
+  """
+  hashed_password = generate_password_hash("1107", method="sha256", salt_length=8)
+  return check_password_hash(hashed_password, password)
+
 if __name__ == "__main__":
-  cursor = mydb.cursor() # just a test
-  cursor.execute("SELECT * FROM Tools WHERE id = 69") # just a test
-  print(cursor.fetchall()) # just a test
   app.run(debug = True)

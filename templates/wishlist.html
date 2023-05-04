@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Wishlist {% endblock %}
+{% block content %}
+{% with messages = get_flashed_messages() %}
+    {%if messages%} 
+      {% for msg in messages %}
+        <p>{{msg}}</p>
+      {% endfor %}
+     {% endif %} 
+  {% endwith %}
+
+<h5> Would you like to add something to the wishlist?</h5>
+<form action = "/wishlist" method = "POST">
+  <p> Name of Tool: <input type = "text" name = "tool_name" /></p>
+  <p> Approximate Price (Round to nearest whole dollar): <input type = "number" name = "tool_price" /></p>
+  <p> Submitted by (Scroll Number): <input type = "number" name = "scroll_num" /></p>
+  <p>Please select the action you would like to take:</p>
+    <input type="radio" id="Add_Tool" name="action" value="Add_Tool">
+      <label for="Add_Tool">Add tool to wishlist</label><br>
+    <input type="radio" id="Remove_Tool" name="action" value="Remove_Tool">
+      <label for="Remove_Tool">Remove tool from wishlist</label><br>
+  <p><input type = "submit" name = "submit" /></p>
+</form>
+
+<head>
+	<title>Current Tool Wishlist</title>
+	<style>
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+	<table>
+		<tr>
+			<th>Tool Name</th>
+			<th>Approximate Price</th>
+			<th>Submitted By</th>
+		</tr>
+		{% for tool in wishlist %}
+			<tr>
+				<td>{{ tool[0] }}</td>
+				<td>{{ tool[1] }}</td>
+				<td>{{ tool[2] }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+</body>
+{% endblock %}
