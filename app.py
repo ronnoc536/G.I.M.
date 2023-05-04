@@ -280,6 +280,14 @@ def garage():
   return render_template("garage.html", garage = garage)
 
 @app.route("/search", methods=["POST", "GET"])
+def search():
+  if request.method == "POST":
+      Searched_Term = request.form["Searched_Term"]
+      cursor.execute(f"SELECT * FROM Tools WHERE name LIKE '%{Searched_Term}%'")
+      tools_from_search = cursor.fetchall()
+      mydb.commit()
+      return render_template("view_tools_page.html", tools = tools_from_search)
+  return render_template("search.html")
 
 @app.route("/logout")
 def logout():
