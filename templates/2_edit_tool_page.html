@@ -21,9 +21,10 @@
        information regarding the tool you would like to edit.
     </h5>
     <form action = "/2_edit_tool_page" method = "POST">
+      <p> <strong>This is the tool ID you selected: </strong><input type="text" name = "tool_id" value="{{ tool[0] }}" readonly></p> <br>
       <p>Tool Name (Be Relatively Specific): <input type="text" name="tool_name" value= "{{ tool[1] }}"/></p>
-      <p> Location of Tool: <input type = "text" name = "tool_location" value= "{{ tool[3] }}"/></p>
-      <p> Condition of Tool: <input type = "text" name = "tool_cond" value= "{{ tool[5] }}"/></p>
+      <p> Location of Tool: <input type = "text" name = "tool_location" value= "{{ tool[2] }}"/></p>
+      <p> Condition of Tool: <input type = "text" name = "tool_cond" value= "{{ tool[3] }}"/></p>
       <p><input type = "submit" name = "submit" /></p>
     </form>
 </body>

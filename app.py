@@ -2,7 +2,7 @@ from flask import Flask, redirect, url_for, render_template, request, session, f
 from datetime import timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
-import ast
+
 
 
 app = Flask(__name__, static_folder='static') # Create a new Flask object named 'app' and set the static folder to 'static'
@@ -64,7 +64,20 @@ def checkout_tool_page():
   Returns:
       rendered HTML template: checkout_tool_page.html
   """
+  cursor = mydb.cursor()
+  cursor.execute("SELECT * FROM Tools WHERE last_taken <= last_returned")
+  tools = cursor.fetchall()
+  mydb.commit()
+  if request.method == "POST":
+    data = request.form
+    tool_id = data["serial_num"]
+    scroll_id = data["scroll_num"]
+    cursor.execute(f"UPDATE Tools SET last_user = {scroll_id}, last_taken = CURRENT_DATE() WHERE id = {tool_id}")
+    mydb.commit()
+    flash("Tool checked out!")
+    return redirect(url_for("user"))
   return render_template("checkout_tool_page.html") 
+
 
 
 @app.route("/return_tool")
@@ -75,6 +88,18 @@ def return_tool_page():
     Returns:
         HTML template: The return_tool_page.html template to be rendered.
     """
+  cursor = mydb.cursor()
+  cursor.execute("SELECT * FROM Tools WHERE last_taken > last_returned")
+  tools = cursor.fetchall()
+  mydb.commit()
+  if request.method == "POST":
+    data = request.form
+    tool_id = data["serial_num"]
+    scroll_id = data["scroll_num"]
+    cursor.execute(f"UPDATE Tools SET last_user = {scroll_id}, last_taken = CURRENT_DATE() WHERE id = {tool_id}")
+    mydb.commit()
+    flash("Tool returned!")
+    return redirect(url_for("user"))
   return render_template("return_tool_page.html")
 
 
@@ -96,7 +121,11 @@ def remove_tool():
   else:
     return redirect(url_for("user"))
 
-  
+'''
+The edit tools is being a real pain in the ass.
+We want to be able to pass in the tool that the user selected into the second add tool page
+but it keeps messing up on actually passing it in. 
+'''
 
 @app.route("/edit_tool_page", methods=["GET", "POST"])
 def edit_tool():
@@ -116,15 +145,47 @@ def edit_tool():
     return redirect(url_for("user"))
 
 
-@app.route("/2_edit_tool_page", methods=["GET", "POST"])
-def edit_tool_2():
-  if "user" in session:
-    tool_string = request.args.get("tool")
-    tool_list = ast.literal_eval(tool_string)
-    return render_template("2_edit_tool_page.html", tool=tool_list)
-  else: 
-    return redirect(url_for("user"))
+@app.route("/2_edit_tool_page", methods=["GET"])
+def edit_tool_get():
+  print("Loaded page")
+  tool_string = request.args.get("tool")
+  if tool_string and "user" in session:
+      tool_list = list(str(tool_string[1:-1]).split(", "))
+      tool_list[0] = int(tool_list[0])
+      del tool_list[2]
+      del tool_list[3]
+      return render_template("2_edit_tool_page.html", tool=tool_list)
+  else:
+    return redirect(url_for("edit_tool"))
 
+
+  
+@app.route("/2_edit_tool_page", methods=["POST"])
+def edit_tool_2():
+    #if form on this page was submited
+    print("edit tool submitted")
+    try:
+      data = request.form
+      cursor = mydb.cursor()
+      sql = f"UPDATE Tools SET name = \"{data['tool_name']}\", location = \"{data['tool_location']}\", quality = \"{data['tool_cond']}\" WHERE ID = {data['tool_id']}"
+      cursor.execute(sql)
+      mydb.commit()
+      flash("Tool edited successfully!")
+      return redirect(url_for("user"))
+    except:
+      return redirect(url_for("edit_tool"))
+
+
+@app.route("/view_tools_page")
+def view_tools():
+  if "user" in session:
+    # Retrieve all tools from the database
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Tools")
+    tools = cursor.fetchall()
+    return render_template("view_tools_page.html", tools=tools)
+  else: 
+    return redirect(url_for("user")) #send to user func where they will be told they are not logged in
 
 @app.route('/add_tool_page', methods=["POST", "GET"])
 def add_tool_page():
