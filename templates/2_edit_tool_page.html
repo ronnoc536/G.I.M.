@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Second Edit Tool{% endblock %}
+{% block content %}
+
+<head>
+    <title>The tool you have selected to edit:</title>
+	<style>
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+
+    <h5>
+      Please fill in the forms with the apporpriate
+       information regarding the tool you would like to edit.
+    </h5>
+    <form action = "/2_edit_tool_page" method = "POST">
+      <p>Tool Name (Be Relatively Specific): <input type="text" name="tool_name" value= "{{ tool[1] }}"/></p>
+      <p> Location of Tool: <input type = "text" name = "tool_location" value= "{{ tool[3] }}"/></p>
+      <p> Condition of Tool: <input type = "text" name = "tool_cond" value= "{{ tool[5] }}"/></p>
+      <p><input type = "submit" name = "submit" /></p>
+    </form>
+</body>
+{% endblock %}

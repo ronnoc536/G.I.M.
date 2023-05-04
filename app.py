@@ -2,6 +2,7 @@ from flask import Flask, redirect, url_for, render_template, request, session, f
 from datetime import timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
+import ast
 
 
 app = Flask(__name__, static_folder='static') # Create a new Flask object named 'app' and set the static folder to 'static'
@@ -97,25 +98,33 @@ def remove_tool():
 
   
 
-@app.route("/edit_tool_page")
+@app.route("/edit_tool_page", methods=["GET", "POST"])
 def edit_tool():
-  if "user" in session:
-    return render_template("edit_tool_page.html")
-  else: 
-    return redirect(url_for("user")) #send to user func where they will be told they are not logged in
-  
-  
-@app.route("/view_tools_page")
-def view_tools():
   if "user" in session:
     # Retrieve all tools from the database
     cursor = mydb.cursor()
     cursor.execute("SELECT * FROM Tools")
     tools = cursor.fetchall()
-    return render_template("view_tools_page.html", tools=tools)
+    if request.method == "POST":
+      tool_id = request.form["serial_num"]
+      # Fetch the specific tool from the database using its ID
+      cursor.execute("SELECT * FROM Tools WHERE id= %s", (tool_id,))
+      tool = cursor.fetchall()
+      return redirect(url_for("edit_tool_2", tool=tool))
+    return render_template("edit_tool_page.html", tools=tools)
   else: 
-    return redirect(url_for("user")) #send to user func where they will be told they are not logged in
-  
+    return redirect(url_for("user"))
+
+
+@app.route("/2_edit_tool_page", methods=["GET", "POST"])
+def edit_tool_2():
+  if "user" in session:
+    tool_string = request.args.get("tool")
+    tool_list = ast.literal_eval(tool_string)
+    return render_template("2_edit_tool_page.html", tool=tool_list)
+  else: 
+    return redirect(url_for("user"))
+
 
 @app.route('/add_tool_page', methods=["POST", "GET"])
 def add_tool_page():
