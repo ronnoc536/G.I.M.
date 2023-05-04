@@ -56,7 +56,7 @@ def CheckRet():
   return render_template("CheckRet.html")
 
 
-@app.route("/checkout_tool")
+@app.route("/checkout_tool", methods=["GET", "POST"])
 def checkout_tool_page():
   """
   Route function for the return tool page.
@@ -75,32 +75,35 @@ def checkout_tool_page():
     cursor.execute(f"UPDATE Tools SET last_user = {scroll_id}, last_taken = CURRENT_DATE() WHERE id = {tool_id}")
     mydb.commit()
     flash("Tool checked out!")
-    return redirect(url_for("user"))
-  return render_template("checkout_tool_page.html") 
+    return redirect(url_for("CheckRet"))
+  return render_template("checkout_tool_page.html", tools = tools) 
 
 
 
-@app.route("/return_tool")
+@app.route("/return_tool", methods=["GET", "POST"])
 def return_tool_page():
-  """
+    """
     Route function for the return tool page.
 
     Returns:
         HTML template: The return_tool_page.html template to be rendered.
     """
-  cursor = mydb.cursor()
-  cursor.execute("SELECT * FROM Tools WHERE last_taken > last_returned")
-  tools = cursor.fetchall()
-  mydb.commit()
-  if request.method == "POST":
-    data = request.form
-    tool_id = data["serial_num"]
-    scroll_id = data["scroll_num"]
-    cursor.execute(f"UPDATE Tools SET last_user = {scroll_id}, last_taken = CURRENT_DATE() WHERE id = {tool_id}")
-    mydb.commit()
-    flash("Tool returned!")
-    return redirect(url_for("user"))
-  return render_template("return_tool_page.html")
+    if request.method == "GET":
+        cursor = mydb.cursor()
+        cursor.execute("SELECT * FROM Tools WHERE last_taken > last_returned")
+        tools = cursor.fetchall()
+        mydb.commit()
+        return render_template("return_tool_page.html", tools=tools)
+
+    if request.method == "POST":
+        data = request.form
+        tool_id = data["serial_num"]
+        scroll_id = data["scroll_num"]
+        cursor = mydb.cursor()
+        cursor.execute(f"UPDATE Tools SET last_user = {scroll_id}, last_returned = CURRENT_DATE() WHERE id = {tool_id}")
+        mydb.commit()
+        flash("Tool returned!")
+        return redirect(url_for("CheckRet"))
 
 
 @app.route("/remove_tool_page", methods=["GET", "POST"])
@@ -121,11 +124,6 @@ def remove_tool():
   else:
     return redirect(url_for("user"))
 
-'''
-The edit tools is being a real pain in the ass.
-We want to be able to pass in the tool that the user selected into the second add tool page
-but it keeps messing up on actually passing it in. 
-'''
 
 @app.route("/edit_tool_page", methods=["GET", "POST"])
 def edit_tool():
