@@ -267,6 +267,20 @@ def user():
     flash("You are not logged in!")
     return redirect(url_for("login"))
 
+@app.route("/garage", methods=["POST", "GET"])
+def garage():
+  cursor = mydb.cursor()
+  cursor.execute("SELECT * FROM Garage")
+  garage = cursor.fetchall()
+  if request.method == "POST":
+      cursor.execute("INSERT INTO Garage (last_cleaned) VALUES (CURRENT_DATE())")
+      mydb.commit()
+      flash("Date added successfully!")
+      return redirect(url_for("user"))
+  return render_template("garage.html", garage = garage)
+
+@app.route("/search", methods=["POST", "GET"])
+
 @app.route("/logout")
 def logout():
   """
