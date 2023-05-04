@@ -248,7 +248,7 @@ def validate_password(password):
   Returns:
     bool: True if the input password matches the generated hash, False otherwise.
   """
-  hashed_password = generate_password_hash("1107247", method="sha256", salt_length=8)
+  hashed_password = generate_password_hash("1107", method="sha256", salt_length=8)
   return check_password_hash(hashed_password, password)
 
 @app.route("/user")
