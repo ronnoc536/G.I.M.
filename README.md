@@ -1,7 +1,7 @@
 # G.I.M.
 Garage Inventory Project -- CS2300 Final Project
 
-    How to Run
+    What is each template file?
 - base.html
   - It has the stuff that will be on every single page. (I.E. Navbar)
   - It creates the block
@@ -31,9 +31,3 @@ Garage Inventory Project -- CS2300 Final Project
 - 404.html
   - error handler for 404 errors.
  
-
-
-
-once inside repo..
-
-'pip install flask'

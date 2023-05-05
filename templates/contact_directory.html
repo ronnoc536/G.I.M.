@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Help {% endblock %}
+{% block content %}
+
+<h5>
+  If you would like to add the name and contact of a previous house manager, please do so below.
+</h5>
+<form action = "/contact_directory" method = "POST">
+  <p> Name of Previous House Manager: <input type = "text" name = "HM_Name" /></p>
+  <p> Scroll Number: <input type = "text" name = "Scroll_Number" /></p>
+  <p> Phone Number: <input type = "text" name = "Phone_Number" /></p>
+  <p> Email Address: <input type = "text" name = "Email_Address" /></p>
+  <p>Please select the action you would like to take:</p>
+    <input type="radio" id="Add" name="action" value="Add">
+      <label for="Add_Tool">Add</label><br>
+    <input type="radio" id="Remove" name="action" value="Remove">
+      <label for="Remove_Tool">Remove: Only need to type in scroll number...</label><br>
+  <p><input type = "submit" name = "submit" /></p>
+</form>
+
+
+
+<head>
+	<title></title>
+	<style>
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+	<table>
+		<tr>
+			<th>Scroll Number</th>
+			<th>Name</th>
+			<th>Phone Number</th>
+      <th>Email Adress</th>
+		</tr>
+		{% for HouseMan in HouseMen %}
+			<tr>
+				<td>{{ HouseMan[0] }}</td>
+				<td>{{ HouseMan[1] }}</td>
+				<td>{{ HouseMan[2] }}</td>
+        <td>{{ HouseMan[3] }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+</body>
+{% endblock %}

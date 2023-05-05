@@ -1,11 +1,21 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+import mysql.connector
+
 
 
 app = Flask(__name__, static_folder='static') # Create a new Flask object named 'app' and set the static folder to 'static'
 app.secret_key = "hello"
 app.permanent_session_lifetime = timedelta(minutes=5) # Set the permanent session lifetime to 5 minutes using the timedelta class
+
+# bad security who cares
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="110724742069",
+  database="TKE_Garage"
+)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -42,7 +52,7 @@ def CheckRet():
   """
   return render_template("CheckRet.html")
 
-@app.route("/checkout_tool")
+@app.route("/checkout_tool", methods=["GET", "POST"])
 def checkout_tool_page():
   """
   Route function for the return tool page.
@@ -50,42 +60,119 @@ def checkout_tool_page():
   Returns:
       rendered HTML template: checkout_tool_page.html
   """
-  return render_template("checkout_tool_page.html") 
+  cursor = mydb.cursor()
+  cursor.execute("SELECT * FROM Tools WHERE last_taken <= last_returned")
+  tools = cursor.fetchall()
+  mydb.commit()
+  if request.method == "POST":
+    data = request.form
+    tool_id = data["serial_num"]
+    scroll_id = data["scroll_num"]
+    cursor.execute(f"UPDATE Tools SET last_user = {scroll_id}, last_taken = CURRENT_DATE() WHERE id = {tool_id}")
+    cursor.execute(f"UPDATE TKE_Member Set tool_checked_out = {tool_id} WHERE scroll_number = {scroll_id}")
+    mydb.commit()
+    flash("Tool checked out!")
+    return redirect(url_for("CheckRet"))
+  return render_template("checkout_tool_page.html", tools = tools) 
 
-@app.route("/return_tool")
+@app.route("/return_tool", methods=["GET", "POST"])
 def return_tool_page():
-  """
+    """
     Route function for the return tool page.
 
     Returns:
         HTML template: The return_tool_page.html template to be rendered.
     """
-  return render_template("return_tool_page.html")
+    if request.method == "GET":
+        cursor = mydb.cursor()
+        cursor.execute("SELECT * FROM Tools WHERE last_taken > last_returned")
+        tools = cursor.fetchall()
+        mydb.commit()
+        return render_template("return_tool_page.html", tools=tools)
 
-@app.route("/remove_tool_page")
+    if request.method == "POST":
+        data = request.form
+        tool_id = data["serial_num"]
+        scroll_id = data["scroll_num"]
+        cursor = mydb.cursor()
+        cursor.execute(f"UPDATE Tools SET last_user = {scroll_id}, last_returned = CURRENT_DATE() WHERE id = {tool_id}")
+        mydb.commit()
+        flash("Tool returned!")
+        return redirect(url_for("CheckRet"))
+
+@app.route("/remove_tool_page", methods=["GET", "POST"])
 def remove_tool():
   if "user" in session:
-    return render_template("remove_tool_page.html")
-  else: 
-    return redirect(url_for("user")) #send to user func where they will be told they are not logged in
-  
+    # Retrieve all tools from the database
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Tools")
+    tools = cursor.fetchall()
+    if request.method == "POST":
+      data = request.form
+      tool_id = data["serial_num"]
+      cursor.execute(f"DELETE FROM Tools WHERE id = {tool_id}")
+      mydb.commit()
+      flash("Tool removed successfully!")
+      return redirect(url_for("user"))
+    return render_template("remove_tool_page.html", tools=tools)
+  else:
+    return redirect(url_for("user"))
 
-@app.route("/edit_tool_page")
+@app.route("/edit_tool_page", methods=["GET", "POST"])
 def edit_tool():
   if "user" in session:
-    return render_template("edit_tool_page.html")
+    # Retrieve all tools from the database
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Tools")
+    tools = cursor.fetchall()
+    if request.method == "POST":
+      tool_id = request.form["serial_num"]
+      # Fetch the specific tool from the database using its ID
+      cursor.execute("SELECT * FROM Tools WHERE id= %s", (tool_id,))
+      tool = cursor.fetchall()
+      return redirect(url_for("edit_tool_2", tool=tool))
+    return render_template("edit_tool_page.html", tools=tools)
   else: 
-    return redirect(url_for("user")) #send to user func where they will be told they are not logged in
-  
-  
+    return redirect(url_for("user"))
+
+@app.route("/2_edit_tool_page", methods=["GET"])
+def edit_tool_get():
+  print("Loaded page")
+  tool_string = request.args.get("tool")
+  if tool_string and "user" in session:
+      tool_list = list(str(tool_string[1:-1]).split(", "))
+      tool_list[0] = int(tool_list[0])
+      del tool_list[2]
+      del tool_list[3]
+      return render_template("2_edit_tool_page.html", tool=tool_list)
+  else:
+    return redirect(url_for("edit_tool"))
+
+@app.route("/2_edit_tool_page", methods=["POST"])
+def edit_tool_2():
+    #if form on this page was submited
+    print("edit tool submitted")
+    try:
+      data = request.form
+      cursor = mydb.cursor()
+      sql = f"UPDATE Tools SET name = \"{data['tool_name']}\", location = \"{data['tool_location']}\", quality = \"{data['tool_cond']}\" WHERE ID = {data['tool_id']}"
+      cursor.execute(sql)
+      mydb.commit()
+      flash("Tool edited successfully!")
+      return redirect(url_for("user"))
+    except:
+      return redirect(url_for("edit_tool"))
 
 @app.route("/view_tools_page")
 def view_tools():
   if "user" in session:
-    return render_template("view_tools_page.html")
+    # Retrieve all tools from the database
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM Tools")
+    tools = cursor.fetchall()
+    return render_template("view_tools_page.html", tools=tools)
   else: 
     return redirect(url_for("user")) #send to user func where they will be told they are not logged in
-  
 
 @app.route('/add_tool_page', methods=["POST", "GET"])
 def add_tool_page():
@@ -99,7 +186,12 @@ def add_tool_page():
   """
   if "user" in session:
     if request.method == "POST":#if they clicked submit on add tools for example
-                                # also where i think that the adding tool to db would go but idk
+      data = request.form #gathers the data from the form into a container to be indexed.
+      cursor = mydb.cursor()
+      sql = f"INSERT INTO Tools (name, last_user, location, last_returned, quality, last_taken) \
+                VALUES (\"{data['tool_name']}\", NULL, \"{data['tool_location']}\", CURRENT_DATE(), \"{data['tool_cond']}\", \"1936-11-12\")"
+      cursor.execute(sql) # executes the sql
+      mydb.commit() # sends the request i guess?
       flash("Tool added successfully!") #lets user know that it got added
       return redirect(url_for("user")) # takes them back to where the options are
     return render_template("add_tool_page.html") # dont remember
@@ -134,19 +226,6 @@ def login():
   else:
     return render_template("login.html")
 
-def validate_password(password):
-  """
-  Validates password by generating a hash using the generate_password_hash() function
-  and checking it against the input password using check_password_hash() function.
-
-  Args: 
-    password (str): password input by user.
-
-  Returns:
-    bool: True if the input password matches the generated hash, False otherwise.
-  """
-  hashed_password = generate_password_hash("1107247", method="sha256", salt_length=8)
-  return check_password_hash(hashed_password, password)
 
 @app.route("/user")
 def user():
@@ -164,6 +243,52 @@ def user():
     flash("You are not logged in!")
     return redirect(url_for("login"))
 
+@app.route("/garage", methods=["POST", "GET"])
+def garage():
+  cursor = mydb.cursor()
+  cursor.execute("SELECT * FROM Garage")
+  garage = cursor.fetchall()
+  if request.method == "POST":
+      cursor.execute("INSERT INTO Garage (last_cleaned) VALUES (CURRENT_DATE())")
+      mydb.commit()
+      flash("Date added successfully!")
+      return redirect(url_for("user"))
+  return render_template("garage.html", garage = garage)
+
+@app.route("/search", methods=["POST", "GET"])
+def search():
+  if request.method == "POST":
+      cursor = mydb.cursor()
+      Searched_Term = request.form["Searched_Term"]
+      cursor.execute(f"SELECT * FROM Tools WHERE name LIKE '%{Searched_Term}%'")
+      tools_from_search = cursor.fetchall()
+      mydb.commit()
+      return render_template("view_tools_page.html", tools = tools_from_search)
+  return render_template("search.html")
+
+@app.route("/wishlist", methods=["GET"])
+def wishlist_get():
+  cursor = mydb.cursor()
+  cursor.execute("SELECT * FROM Tool_Wishlist")
+  wishlist = cursor.fetchall()
+  return render_template("wishlist.html", wishlist=wishlist)
+
+@app.route("/wishlist", methods=["POST"])
+def wishlist():
+  data = request.form
+  action = request.form['action']
+  if action == "Add_Tool":
+    cursor = mydb.cursor()
+    cursor.execute(f"INSERT INTO Tool_Wishlist (name, estimated_price, submitted_by) VALUES (\"{data['tool_name']}\", \"{data['tool_price']}\", \"{data['scroll_num']}\")")
+    mydb.commit()
+    flash("Wishlist updated successfully!")
+  elif action == "Remove_Tool":
+    cursor = mydb.cursor()
+    cursor.execute(f"DELETE FROM Tool_Wishlist WHERE name = \"{data['tool_name']}\"")
+    mydb.commit()
+    flash("Wishlist updated successfully!")
+  return redirect("wishlist")
+
 @app.route("/logout")
 def logout():
   """
@@ -177,6 +302,69 @@ def logout():
     flash(f"You have been logged out", "info")
   session.pop("user", None)
   return redirect(url_for("login"))
+
+@app.route("/view_members",methods =["GET"])
+def view_members():
+  cursor = mydb.cursor()
+  cursor.execute("SELECT * FROM TKE_Member")
+  member = cursor.fetchall()
+  return render_template("view_members.html", member = member)
+
+@app.route("/view_members",methods =["POST"])
+def view_members_post():
+  try:
+    data = request.form
+    cursor = mydb.cursor()
+    cursor.execute(f"INSERT INTO TKE_Member (scroll_number, name, tool_checked_out) VALUES (\"{data['scroll_number']}\", \"{data['member_name']}\", NULL)")
+    mydb.commit()
+    flash("TKE Member Added Successfully!")
+    return redirect(url_for("view_members"))
+  except:
+      flash("Something Went Wrong...")
+      return redirect(url_for("user"))
+
+@app.route("/contact_directory", methods =["GET"])
+def contact_directory():
+  cursor = mydb.cursor()
+  cursor.execute("SELECT * FROM House_Manager")
+  HouseMen = cursor.fetchall()
+  return render_template("contact_directory.html", HouseMen = HouseMen)
+
+@app.route("/contact_directory", methods =["POST"])
+def contact_directory_post():
+  try:
+    data = request.form
+    action = request.form['action']
+    if action == "Add":
+      cursor = mydb.cursor()
+      cursor.execute(f"INSERT INTO House_Manager (scroll_number, name, phone_number, email) VALUES ({data['Scroll_Number']}, \"{data['HM_Name']}\", \"{data['Phone_Number']}\", \"{data['Email_Address']}\")")
+      mydb.commit()
+      flash("House Manager Added Successfully!")
+      return redirect(url_for("contact_directory"))
+    elif action == "Remove":
+      cursor = mydb.cursor()
+      cursor.execute(f"DELETE FROM House_Manager WHERE scroll_number = {data['Scroll_Number']}")
+      mydb.commit()
+      flash("House Manager Deleted Successfully!")
+      return redirect(url_for("contact_directory"))
+  except:
+      flash("Something Went Wrong...")
+      return redirect(url_for("user"))
+
+
+def validate_password(password):
+  """
+  Validates password by generating a hash using the generate_password_hash() function
+  and checking it against the input password using check_password_hash() function.
+
+  Args: 
+    password (str): password input by user.
+
+  Returns:
+    bool: True if the input password matches the generated hash, False otherwise.
+  """
+  hashed_password = generate_password_hash("1107", method="sha256", salt_length=8)
+  return check_password_hash(hashed_password, password)
 
 if __name__ == "__main__":
   app.run(debug = True)

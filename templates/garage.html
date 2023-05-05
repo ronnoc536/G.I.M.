@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Garage {% endblock %}
+{% block content %}
+
+<html>
+<head>
+	<title>All Tools in TKE Garage</title>
+	<style>
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+    <form action = "/garage" method="POST">
+      <br>
+      <p><input type = "submit" name = "submit" value="Add New Clean Date"/></p>
+    </form>
+    <h1>Garage Clean Dates</h1>
+    <table>
+        <tr>
+            <th>Date</th>
+        </tr>
+        {% for last_cleaned in garage %}
+            <tr>
+                <td>{{ last_cleaned[0] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+
+{% endblock %}

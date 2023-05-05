@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Search {% endblock %}
+{% block content %}
+<h5>
+    What would you like to search for?
+</h5>
+<form action = "/search" method = "POST">
+    <p> Tool Name (Be Relatively Specific): <input type = "text" name = "Searched_Term" /></p>
+    <p><input type = "submit" name = "submit" /></p>
+</form>
+
+{% endblock %}
