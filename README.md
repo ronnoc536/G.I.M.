@@ -1,7 +1,7 @@
 # G.I.M.
 Garage Inventory Project -- CS2300 Final Project
 
-    What is each template file?
+    How to Run
 - base.html
   - It has the stuff that will be on every single page. (I.E. Navbar)
   - It creates the block
