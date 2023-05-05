@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}View Members{% endblock %}
+{% block content %}
+{% with messages = get_flashed_messages() %}
+    {%if messages%} 
+      {% for msg in messages %}
+        <p>{{msg}}</p>
+      {% endfor %}
+     {% endif %} 
+  {% endwith %}
+
+<h1>Active Specific Information</h1>
+<p>Be careful of add member, this action cannot be undone.</p>
+<form action="/view_members" method="POST">
+  <p> Member Name: <input type = "text" name = "member_name" /></p>
+  <p> Numeric Scroll Number: <input type = "text" name = "scroll_number" /></p>
+  <p><input type = "submit" name = "Add Member" /></p>
+</form>
+<head>
+	<title>Current Member Roster</title>
+	<style>
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+	<table>
+		<tr>
+			<th>Scroll Number</th>
+			<th>Name</th>
+			<th>Last Tool Checked Out</th>
+		</tr>
+		{% for tke in member %}
+			<tr>
+				<td>{{ tke[0] }}</td>
+				<td>{{ tke[1] }}</td>
+				<td>{{ tke[2] }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+</body>
+</html>
+
+{% endblock %}
