@@ -10,16 +10,11 @@
   {% endwith %}
 
 <h1>Active Specific Information</h1>
+<p>Be careful of add member, this action cannot be undone.</p>
 <form action="/view_members" method="POST">
   <p> Member Name: <input type = "text" name = "member_name" /></p>
   <p> Numeric Scroll Number: <input type = "text" name = "scroll_number" /></p>
-  <p>Please select the action you would like to take:</p>
-    <input type="radio" id="Add_Member" name="action" value="Add_Member">
-      <label for="Add_Member">Add Member</label><br>
-    <input type="radio" id="Remove_Member" name="action" value="Remove_Member">
-      <label for="Remove_Member">Remove Member</label><br>
-    <p><input type = "submit" name = "submit" /></p>
-  </p>
+  <p><input type = "submit" name = "Add Member" /></p>
 </form>
 <head>
 	<title>Current Member Roster</title>

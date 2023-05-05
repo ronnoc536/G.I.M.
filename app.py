@@ -314,19 +314,39 @@ def view_members():
 def view_members_post():
   try:
     data = request.form
+    cursor = mydb.cursor()
+    cursor.execute(f"INSERT INTO TKE_Member (scroll_number, name, tool_checked_out) VALUES (\"{data['scroll_number']}\", \"{data['member_name']}\", NULL)")
+    mydb.commit()
+    flash("TKE Member Added Successfully!")
+    return redirect(url_for("view_members"))
+  except:
+      flash("Something Went Wrong...")
+      return redirect(url_for("user"))
+
+@app.route("/contact_directory", methods =["GET"])
+def contact_directory():
+  cursor = mydb.cursor()
+  cursor.execute("SELECT * FROM House_Manager")
+  HouseMen = cursor.fetchall()
+  return render_template("contact_directory.html", HouseMen = HouseMen)
+
+@app.route("/contact_directory", methods =["POST"])
+def contact_directory_post():
+  try:
+    data = request.form
     action = request.form['action']
-    if action == "Add_Member":
+    if action == "Add":
       cursor = mydb.cursor()
-      cursor.execute(f"INSERT INTO TKE_Member (scroll_number, name, tool_checked_out) VALUES (\"{data['scroll_number']}\", \"{data['member_name']}\", NULL)")
+      cursor.execute(f"INSERT INTO House_Manager (scroll_number, name, phone_number, email) VALUES ({data['Scroll_Number']}, \"{data['HM_Name']}\", \"{data['Phone_Number']}\", \"{data['Email_Address']}\")")
       mydb.commit()
-      flash("TKE Member Added Successfully!")
-      return redirect(url_for("view_members"))
-    elif action == "Remove_Member":
+      flash("House Manager Added Successfully!")
+      return redirect(url_for("contact_directory"))
+    elif action == "Remove":
       cursor = mydb.cursor()
-      cursor.execute(f"DELETE FROM TKE_Member WHERE scroll_number = \"{data['scroll_number']}\"")
+      cursor.execute(f"DELETE FROM House_Manager WHERE scroll_number = {data['Scroll_Number']}")
       mydb.commit()
-      flash("TKE Member Deleted Successfully!")
-      return redirect(url_for("view_members"))
+      flash("House Manager Deleted Successfully!")
+      return redirect(url_for("contact_directory"))
   except:
       flash("Something Went Wrong...")
       return redirect(url_for("user"))
